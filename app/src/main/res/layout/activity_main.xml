@@ -51,6 +51,14 @@
             android:layout_height="wrap_content"
             android:paddingTop="20dp"
             android:text="Расстояние Z:" />
+
+        <TextView
+            android:id="@+id/toOneMultiply"
+            style="@style/Widget.AppCompat.TextView.SpinnerItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="20dp"
+            android:text="До метра *:" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
