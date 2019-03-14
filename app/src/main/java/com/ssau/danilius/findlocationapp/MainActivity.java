@@ -29,9 +29,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     float vx = 0.0f;
     List<float[]> data = new ArrayList<float[]>();
     float[] resultData;
+    List<Long> timerms = new ArrayList<Long>();
     private static final int SHAKE_THRESHOLD = 600;
     float accel[] = new float[]{0.0f, 0.0f, 0.0f}, result[] = new float[]{0.0f, 0.0f, 0.0f};
     float kFilteringFactor = 0.8f;
+    long init,now,time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
                     accelerometr = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
                     sensorManager.registerListener((SensorEventListener) MainActivity.this, accelerometr, SensorManager.SENSOR_DELAY_GAME);
+                    init=System.currentTimeMillis();
                 } else {
                     if (startFlag) {
                         startFlag = false;
@@ -77,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
                         accelerometr = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
                         sensorManager.registerListener((SensorEventListener) MainActivity.this, accelerometr, SensorManager.SENSOR_DELAY_GAME);
+                        init=System.currentTimeMillis();
                     }
                 }
             }
@@ -94,16 +98,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             if (Math.abs(sensorEvent.values[2])>0.4){result[2] = sensorEvent.values[2];}
             float[] thisData = new float[]{result[0], result[1], result[2]};
             data.add(thisData);
+            timerms.add(System.currentTimeMillis() - init);
         }
 
     }
 
     public void GetData(List<float[]> data) {
-        String Resultx = "",Resulty = "",Resultz = "";
-        for (float[] value: data) {
-            Resultx +=value[0]+"\n";
-            Resulty +=value[1]+"\n";
-            Resultz +=value[2]+"\n";
+        String Resultx = "",Resulty = "",Resultz = "",time ="";
+        for (int i=0;i<data.size();i++) {
+            Resultx +=data.get(i)[0]+"\n";
+            Resulty +=data.get(i)[1]+"\n";
+            Resultz +=data.get(i)[2]+"\n";
+            time += timerms.get(i)+"\n";
         }
         Resultx += "end";
         Resulty += "end";
@@ -112,27 +118,30 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     public List<float[]>  CheckData(List<float[]> data) {
         Boolean check = false;
-        int countX=0,countY=0,countZ =0;
+        double countX=0,countY=0,countZ =0;
         for (float[] value: data) {
+            countX += Math.abs(value[0]);
+            countY += Math.abs(value[1]);
+            countZ += Math.abs(value[2]);
             if (data.get(0)[0] == value[0]){countX++;}
             if (data.get(0)[1] == value[1]){countY++;}
             if(data.get(0)[2] == value[2]){countZ++;}
         }
-        if (countX == data.size()) {
+        /*if (countX > data.size()/2) {
             for (float[] value : data) {
                 value[0] = 0;
             }
         }
-        if (countY == data.size()) {
+        if (countY > data.size()/2) {
             for (float[] value : data) {
                 value[1] = 0;
             }
         }
-        if (countZ == data.size()) {
+        if (countZ > data.size()/2) {
             for (float[] value : data) {
                 value[2] = 0;
             }
-        }
+        }*/
         return data;
     }
 
