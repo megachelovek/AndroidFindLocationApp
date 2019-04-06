@@ -93,9 +93,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     public void onSensorChanged(SensorEvent sensorEvent) {
         if (startFlag) {
-            if (Math.abs(sensorEvent.values[0])>0.4){result[0] = sensorEvent.values[0];}
-            if (Math.abs(sensorEvent.values[1])>0.4){result[1] = sensorEvent.values[1];}
-            if (Math.abs(sensorEvent.values[2])>0.4){result[2] = sensorEvent.values[2];}
+            if (Math.abs(sensorEvent.values[0])>0){result[0] = sensorEvent.values[0];}
+            if (Math.abs(sensorEvent.values[1])>0){result[1] = sensorEvent.values[1];}
+            if (Math.abs(sensorEvent.values[2])>0){result[2] = sensorEvent.values[2];}
             float[] thisData = new float[]{result[0], result[1], result[2]};
             data.add(thisData);
             timerms.add(System.currentTimeMillis() - init);
