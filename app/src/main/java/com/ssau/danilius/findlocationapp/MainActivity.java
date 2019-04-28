@@ -64,7 +64,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         btnStartFindLocation.setBackgroundColor(Color.RED);
                         GetData(data);
                         data = CheckData(data);
-                        data = SimpleFilter.FilterListSignal(data,(float)0.05); //(float) 5.23e-6
+                        KalmanFilter kalmanFilter = new KalmanFilter(data);
+                        data = kalmanFilter.DoFiltering();
+                        //data = SimpleFilter.FilterListSignal(data,(float)0.05); //(float) 5.23e-6
                         resultData = CalculateDistance.GetDistance(1, data);
                         GetData(data);
                         xDistanceTextView.setText("Расстояние X:" + String.valueOf(resultData[0]*0.0002264));///1e15
