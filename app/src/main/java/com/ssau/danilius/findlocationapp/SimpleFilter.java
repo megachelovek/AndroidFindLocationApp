@@ -3,7 +3,7 @@ package com.ssau.danilius.findlocationapp;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimpleFilter {
+public class SimpleFilter { //ИСПОЛЬЗУЮ ФИЛЬТР КАЛМАНА
     public static List<float[]> FilterListSignal(List<float[]> inputData, float alfa){
         float[] newArrayX = new float[inputData.size()];
         float[] newArrayY = new float[inputData.size()];

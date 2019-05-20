@@ -1,15 +1,12 @@
 package com.ssau.danilius.findlocationapp;
 
-import org.apache.commons.math3.filter.DefaultProcessModel;
-import org.apache.commons.math3.filter.ProcessModel;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class KalmanFilter {
     private List<float[]> dataToFilter = new ArrayList<float[]>();
-    private static final float Q = (float) Math.pow(10, 5); //Дисперсия процесса
-    private static final float R = (float) Math.pow(10, 6) * 2; // Погрешность процесса - менять в основном это
+    private static final float Q = (float) Math.pow(10, 1); //Дисперсия процесса
+    private static final float R = (float) Math.pow(10, 1) * (float) 20; // Погрешность процесса - менять в основном это (чем больще значение - тем ближе к середине)
 
     public KalmanFilter(List<float[]> rawData) {
         dataToFilter = rawData;
@@ -53,6 +50,6 @@ public class KalmanFilter {
             xhat[k] = xhatminus[k] + K[k] * (rawSignal[k] - xhatminus[k]);
             P[k] = (1 - K[k]) * Pminus[k];
         }
-        return rawSignal;
+        return xhat;
     }
 }
