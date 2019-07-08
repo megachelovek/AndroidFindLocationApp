@@ -67,21 +67,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
                         convertDataToTextAccelerometr(dataAccelerometr);
                         temp = dataAccelerometr.subList(0,dataAccelerometr.size());
-                        dataAccelerometr = CheckData(dataAccelerometr);
-                        KalmanFilter kalmanFilter = new KalmanFilter(dataAccelerometr);
-                        dataAccelerometr = kalmanFilter.DoFiltering();
-                        resultData = CalculateDistance.GetDistance((float) 0.3, dataAccelerometr);
-                        float tempResult = resultData[0];
+                        //dataAccelerometr = CheckData(dataAccelerometr);
+                        dataAccelerometr = checkEqualsValuesNullSeries(dataAccelerometr,5);
                         convertDataToTextAccelerometr(dataAccelerometr);
-                        AlphaBetaFilter alphaBetaFilter= new AlphaBetaFilter(temp,(float) 0.3);
-                        dataAccelerometr = alphaBetaFilter.DoFiltering();
-                        convertDataToTextAccelerometr(dataAccelerometr);
-                        resultData = CalculateDistance.GetDistance((float) 0.3, dataAccelerometr);
 
-                        xDistanceTextView.setText("Расстояние X:" + String.valueOf(tempResult * 0.01));///1e15
-                        yDistanceTextView.setText("Расстояние Y:" + String.valueOf(resultData[0] * 0.01));//*0.0002264
-                        zDistanceTextView.setText("Расстояние Z:" + String.valueOf(resultData[2] * 0.01));
+//                        KalmanFilter kalmanFilter = new KalmanFilter(dataAccelerometr);
+//                        dataAccelerometr = kalmanFilter.DoFiltering();
+//                        resultData = CalculateDistance.getTestDistance((float) SensorManager.SENSOR_DELAY_GAME, dataAccelerometr);
+//                        convertDataToTextAccelerometr(dataAccelerometr);
+
+                        AlphaBetaFilter alphaBetaFilter= new AlphaBetaFilter(temp,(float) SensorManager.SENSOR_DELAY_GAME);
+                        dataAccelerometr = alphaBetaFilter.DoFiltering();
+                        resultData = CalculateDistance.getTestDistance((float) SensorManager.SENSOR_DELAY_GAME, dataAccelerometr);
+                        convertDataToTextAccelerometr(dataAccelerometr);
+
+                        xDistanceTextView.setText("Расстояние X:" + String.valueOf(resultData[0] * 0.001));///1e15
+                        yDistanceTextView.setText("Расстояние Y:" + String.valueOf(resultData[1] * 0.001));//*0.0002264
+                        zDistanceTextView.setText("Расстояние Z:" + String.valueOf(resultData[2] * 0.001));
                         toOneMetres.setText("До метра (без коэф.):" + String.valueOf(1 / resultData[0]));
+
                         sensorManager.unregisterListener((SensorEventListener) MainActivity.this);
                         dataAccelerometr = new ArrayList<float[]>() {
                         };
@@ -119,12 +123,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 
-    public void saveDataFromSensor(int indexValue, float value, String sensorName){
+    private void saveDataFromSensor(int indexValue, float value, String sensorName){
         if (sensorName == "Linear Acceleration"){valuesFromAccelerometr[indexValue] = value;}
         if (sensorName == "BMI160 Gyroscope"){valuesFromGyroscope[indexValue] = value;}
     }
 
-    public void convertDataToTextAccelerometr(List<float[]> data) {
+    private void convertDataToTextAccelerometr(List<float[]> data) {
         String  resultXAccelerometr= "", resultYAccelerometr = "", resultZAccelerometr = "", time = "";
         for (int i = 0; i < data.size(); i++) {
             resultXAccelerometr += data.get(i)[0] + "\n";
@@ -136,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         resultYAccelerometr += "end";
         resultZAccelerometr += "end";
     }
-    public void convertDataToTextGyroscope(List<float[]> data) {
+    private void convertDataToTextGyroscope(List<float[]> data) {
         String  resultXGyroscope= "", resultYGyroscope = "", resultZGyroscope = "", time = "";
         for (int i = 0; i < data.size(); i++) {
             resultXGyroscope += data.get(i)[0] + "\n";
@@ -149,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         resultZGyroscope += "end";
     }
 
-    public List<float[]> CheckData(List<float[]> data) {
+    private List<float[]> CheckData(List<float[]> data) {
         double countX = 0, countY = 0, countZ = 0;
         for (int i = 1; i < data.size(); i++) {
             if (data.get(i)[0] == data.get(i - 1)[0]) {
@@ -181,5 +185,44 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return data;
     }
 
+    ///Удаляет большие последовательности одинаковых цифр
+    private List<float[]> checkEqualsValuesNullSeries(List<float[]> data, int count){
+        List<float[]> resultList = data;
+        int currentSeries=0,currentStartSeries=0,currentEndSeries=0;
+        boolean isSeries = false;
+        for (int j=0; j< 3;j++) {
+            for (int i = 1; i < data.size(); i++) {
+                if ((data.get(i)[j] == data.get(i - 1)[j]) && (i + 1 < data.size())) {
+                    if (!isSeries) {
+                        currentStartSeries = i;
+                    }
+                    isSeries = true;
+                    currentSeries++;
+                } else {
+                    isSeries = false;
+                    currentEndSeries = i - 1;
+                    if (currentSeries >= count) {
+                        if (i + 1 < data.size()) {
+                            currentEndSeries = +2;
+                        }
+                        resultList = NullSeries(data, j, currentStartSeries, currentEndSeries);
+                    }
+                    currentSeries = 0;
+                    currentStartSeries = 0;
+                    currentEndSeries = 0;
+                }
+            }
+            currentSeries =0;
+            currentStartSeries =0;
+            currentEndSeries =0;
+        }
+        return resultList;
+    }
+    private List<float[]> NullSeries(List<float[]> data, int indexAxe,int startIndex,int endIndex) {
+        for (int i = startIndex; i < endIndex; i++) {
+            data.get(i)[indexAxe] = 0;
+        }
+        return data;
+    }
 }
 

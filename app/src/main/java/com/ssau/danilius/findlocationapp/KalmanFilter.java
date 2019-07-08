@@ -13,6 +13,7 @@ public class KalmanFilter {
     }
 
     public List<float[]> DoFiltering() {
+        if (dataToFilter.size()==0) return new ArrayList<float[]>(){{add(new float[]{0, 0, 0});}};
         List<float[]> result = new ArrayList<float[]>();
         float[] temp;
         for (int i = 0; i < dataToFilter.get(0).length; i++) {

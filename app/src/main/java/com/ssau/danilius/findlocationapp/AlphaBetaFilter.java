@@ -13,6 +13,7 @@ public class AlphaBetaFilter {
     }
 
     public List<float[]> DoFiltering() {
+        if (dataToFilter.size()==0) return new ArrayList<float[]>(){{add(new float[]{0, 0, 0});}};
         List<float[]> result = new ArrayList<float[]>();
         float[] temp;
         for (int i = 0; i < dataToFilter.get(0).length; i++) {
@@ -39,23 +40,19 @@ public class AlphaBetaFilter {
     public float[] FilterData(float[] data) {
         float xk_1 = (float)0;
         float vk_1 =(float) 0;
-        float a = (float)0.85;
-        float b = (float) 0.005;
+        float a = (float)9.25;
+        float b = (float) 1.5;
         float xk, vk, rk;
         float[] result = new float[data.length];
         for(int i=0; i<data.length;i++)
         {
             xk = xk_1 + (vk_1 * dt);
             vk = vk_1;
-
             rk = data[i] - xk;
-
             xk += a * rk;
             vk += (b * rk) / dt;
-
             xk_1 = xk;
             vk_1 = vk;
-
             result[i]= xk_1;
         }
         return result;
