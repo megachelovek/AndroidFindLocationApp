@@ -10,4 +10,4 @@ Added Kalman and other filters.
   - SQLite
   - Gradle
 
-**Q4 2018**
+**Q4 2019**
